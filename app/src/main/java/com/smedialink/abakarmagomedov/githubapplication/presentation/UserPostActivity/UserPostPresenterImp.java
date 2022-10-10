@@ -32,9 +32,29 @@ public class UserPostPresenterImp implements UserPostPresenter {
         disposable = interactor.loadReposFromGithub(login)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable1 -> view.showDialog())
-                .doOnTerminate(() -> view.hideDialog())
-                .subscribe(repositories -> view.fetchData(repositories), throwable -> view.error());
+                .doOnSubscribe(new Consumer<Disposable>() {
+                    @Override
+                    public void accept(Disposable disposable1) throws Exception {
+                        view.showDialog();
+                    }
+                })
+                .doOnTerminate(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        view.hideDialog();
+                    }
+                })
+                .subscribe(new Consumer<List<Repository>>() {
+                    @Override
+                    public void accept(List<Repository> repositories) throws Exception {
+                        view.fetchData(repositories);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        view.error();
+                    }
+                });
     }
 
     @Override

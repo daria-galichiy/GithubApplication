@@ -1,6 +1,7 @@
 package com.smedialink.abakarmagomedov.githubapplication;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -47,7 +48,12 @@ public class BaseActivity extends AppCompatActivity {
 
     protected AlertDialog getErrorDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setPositiveButton(R.string.Ok, (dialog, which) -> dialog.dismiss());
+        builder.setPositiveButton(R.string.Ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
         builder.setMessage(R.string.no_internet);
         return builder.create();
     }

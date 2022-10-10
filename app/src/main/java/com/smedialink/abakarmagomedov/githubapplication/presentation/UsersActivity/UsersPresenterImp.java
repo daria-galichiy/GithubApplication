@@ -1,9 +1,15 @@
 package com.smedialink.abakarmagomedov.githubapplication.presentation.UsersActivity;
 
+import com.smedialink.abakarmagomedov.githubapplication.data.entity.User;
+
+import java.util.List;
+
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -26,9 +32,29 @@ public class UsersPresenterImp implements UsersPresenter {
         disposable = interactor.loadUsersFromGit()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable1 -> view.showDialog())
-                .doOnTerminate(() -> view.hideDialog())
-                .subscribe(users -> view.showUsers(users), throwable -> view.error());
+                .doOnSubscribe(new Consumer<Disposable>() {
+                    @Override
+                    public void accept(Disposable disposable1) throws Exception {
+                        view.showDialog();
+                    }
+                })
+                .doOnTerminate(new Action() {
+                    @Override
+                    public void run() {
+                        view.hideDialog();
+                    }
+                })
+                .subscribe(new Consumer<List<User>>() {
+                    @Override
+                    public void accept(List<User> users) throws Exception {
+                        view.showUsers(users);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        view.error();
+                    }
+                });
     }
 
     @Override
